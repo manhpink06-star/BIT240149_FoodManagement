@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = T["NotFound"];
+}
+<section class="panel center-panel">
+    <div class="error-code">404</div>
+    <h1>@T["NotFound"]</h1>
+    <p class="muted">@T["NotFoundDetails"]</p>
+    <a class="btn primary" asp-controller="Dishes" asp-action="Index">@T["BackToList"]</a>
+</section>

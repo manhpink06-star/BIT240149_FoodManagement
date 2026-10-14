@@ -1,0 +1,85 @@
+@model Dish_BIT240149
+@{
+    ViewData["Title"] = T["DishDetails"];
+}
+<div class="page-head">
+    <div>
+        <div class="eyebrow">BIT240149 / @T["DishDetails"] #@Model.Id</div>
+        <h1>@Model.Name</h1>
+        <p class="muted">@Model.DishCategory.Name</p>
+    </div>
+    <div class="header-actions">
+        <a class="btn ghost" asp-action="Index">← @T["BackToList"]</a>
+        <a class="btn primary" asp-action="Edit" asp-route-id="@Model.Id">@T["Edit"]</a>
+    </div>
+</div>
+
+<div class="details-layout">
+    <section class="panel">
+        <h2>@T["DishDetails"]</h2>
+        <dl class="details-list">
+            <dt>@T["Name"]</dt><dd>@Model.Name</dd>
+            <dt>@T["Category"]</dt><dd>@Model.DishCategory.Name</dd>
+            <dt>@T["Price"]</dt><dd class="price">@Model.Price.ToString("N0")</dd>
+            <dt>@T["PreparationTime"]</dt><dd>@Model.PreparationTime @T["Minutes"]</dd>
+            <dt>@T["PrepClass"]</dt>
+            <dd><span class="pill @(Model.PreparationTime <= 15 ? "quick" : "regular")">@(Model.PreparationTime <= 15 ? T["Quick"] : T["Regular"])</span></dd>
+            <dt>@T["Status"]</dt>
+            <dd><span class="pill @(Model.IsAvailable ? "available" : "unavailable")">@(Model.IsAvailable ? T["Available"] : T["Unavailable"])</span></dd>
+            <dt>@T["Description"]</dt><dd>@(Model.Description ?? "—")</dd>
+        </dl>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('@T["DeleteDishConfirm"]')">
+            <button type="submit" class="btn danger">@T["Delete"]</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>@T["Photos"] (@Model.Images.Count)</h2>
+        @if (!Model.Images.Any())
+        {
+            <div class="empty">@T["NoImages"]</div>
+        }
+        else
+        {
+            <div class="photo-grid">
+                @foreach (var photo in Model.Images.OrderByDescending(i => i.IsThumbnail).ThenBy(i => i.Id))
+                {
+                    <div class="photo-card">
+                        <img src="@photo.ImageUrl" alt="@Model.Name" />
+                        <div class="photo-actions">
+                            @if (photo.IsThumbnail)
+                            {
+                                <span class="pill available">@T["Thumbnail"]</span>
+                            }
+                            else
+                            {
+                                <form asp-controller="Images" asp-action="SetThumbnail" asp-route-id="@photo.Id" method="post">
+                                    <button type="submit" class="btn small ghost">@T["SetThumbnail"]</button>
+                                </form>
+                            }
+                            <form asp-controller="Images" asp-action="Delete" asp-route-id="@photo.Id" method="post" onsubmit="return confirm('@T["DeleteImageConfirm"]')">
+                                <button type="submit" class="btn small danger">@T["Delete"]</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        <div class="subsection">
+            <h3>@T["AddImage"]</h3>
+            <form asp-controller="Images" asp-action="Add" method="post">
+                <input type="hidden" name="dishId" value="@Model.Id" />
+                <div class="field">
+                    <label for="imageUrl">@T["ImageUrl"]</label>
+                    <input id="imageUrl" name="imageUrl" type="text" maxlength="2000" placeholder="https://example.com/food.jpg" required />
+                    <small class="muted">@T["ImageUrlHint"]</small>
+                </div>
+                <div class="check-field">
+                    <input type="checkbox" name="makeThumbnail" value="true" id="makeThumbnail" />
+                    <label for="makeThumbnail">@T["MakeThumbnail"]</label>
+                </div>
+                <button type="submit" class="btn primary">+ @T["AddImage"]</button>
+            </form>
+        </div>
+    </section>
+</div>

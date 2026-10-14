@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - BIT240149</title>
+    <link rel="stylesheet" asp-append-version="true" href="~/css/site.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="container nav-content">
+            <a class="brand" asp-controller="Dishes" asp-action="Index">
+                <span class="brand-icon">B</span>
+                <span>@T["SiteName"]</span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a asp-controller="Dishes" asp-action="Index">@T["Dishes"]</a>
+                <a asp-controller="Categories" asp-action="Index">@T["Categories"]</a>
+            </nav>
+            <form asp-controller="Language" asp-action="Switch" method="post" class="language-form">
+                <input type="hidden" name="returnUrl" value="@(Context.Request.Path.ToString() + Context.Request.QueryString.ToString())" />
+                <label for="cultureSelect" class="sr-only">@T["Language"]</label>
+                <select id="cultureSelect" name="culture" aria-label="@T["Language"]" onchange="this.form.submit()">
+                    <option value="en" selected="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName != "vi")">English</option>
+                    <option value="vi" selected="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "vi")">Tiếng Việt</option>
+                </select>
+                <button class="sr-only" type="submit">@T["SwitchLanguage"]</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="container content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert success" role="status">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert error" role="alert">@TempData["Error"]</div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="container">@T["Copyright"]</div>
+    </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,45 @@
+@model List<DishCategory_BIT240149>
+@{
+    ViewData["Title"] = T["CategoryList"];
+}
+<div class="page-head">
+    <div>
+        <div class="eyebrow">BIT240149 / ORM</div>
+        <h1>@T["CategoryList"]</h1>
+    </div>
+    <a class="btn primary" asp-action="Create">+ @T["CreateCategory"]</a>
+</div>
+<section class="panel table-panel">
+    @if (!Model.Any())
+    {
+        <div class="empty">@T["NoCategories"]</div>
+    }
+    else
+    {
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr><th>@T["Name"]</th><th>@T["Description"]</th><th>@T["DishCount"]</th><th>@T["Actions"]</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model)
+                    {
+                        <tr>
+                            <td class="dish-name">@category.Name</td>
+                            <td>@(category.Description ?? "—")</td>
+                            <td>@category.Dishes.Count</td>
+                            <td>
+                                <div class="action-links">
+                                    <a asp-action="Edit" asp-route-id="@category.Id">@T["Edit"]</a>
+                                    <form asp-action="Delete" asp-route-id="@category.Id" method="post" onsubmit="return confirm('@T["DeleteCategoryConfirm"]')">
+                                        <button type="submit" class="text-danger">@T["Delete"]</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

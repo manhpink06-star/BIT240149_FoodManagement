@@ -1,0 +1,116 @@
+@model DishIndexViewModel
+@{
+    ViewData["Title"] = T["DishList"];
+}
+<div class="page-head">
+    <div>
+        <div class="eyebrow">BIT240149 / ORM</div>
+        <h1>@T["DishList"]</h1>
+        <p class="muted">@T["ListSubtitle"]</p>
+    </div>
+    <a class="btn primary" asp-action="Create">+ @T["CreateDish"]</a>
+</div>
+
+<section class="panel">
+    <h2>@T["Filters"]</h2>
+    <form method="get" asp-action="Index" class="filters">
+        <div class="field wide">
+            <label for="search">@T["Search"]</label>
+            <input id="search" name="search" value="@Model.Search" placeholder="@T["SearchPlaceholder"]" />
+        </div>
+        <div class="field">
+            <label for="categoryId">@T["Category"]</label>
+            <select name="categoryId" id="categoryId">
+                <option value="">@T["AllCategories"]</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">@category.Name</option>
+                }
+            </select>
+        </div>
+        <div class="field">
+            <label for="status">@T["Status"]</label>
+            <select name="status" id="status">
+                <option value="all" selected="@(Model.Status == "all")">@T["AllStatuses"]</option>
+                <option value="available" selected="@(Model.Status == "available")">@T["Available"]</option>
+                <option value="unavailable" selected="@(Model.Status == "unavailable")">@T["Unavailable"]</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="minPrice">@T["MinPrice"]</label>
+            <input id="minPrice" name="minPrice" type="number" step="1" min="0" value="@(Model.MinPrice?.ToString(CultureInfo.InvariantCulture))" />
+        </div>
+        <div class="field">
+            <label for="maxPrice">@T["MaxPrice"]</label>
+            <input id="maxPrice" name="maxPrice" type="number" step="1" min="0" value="@(Model.MaxPrice?.ToString(CultureInfo.InvariantCulture))" />
+        </div>
+        <div class="field">
+            <label for="sort">@T["SortBy"]</label>
+            <select name="sort" id="sort">
+                <option value="name" selected="@(Model.Sort == "name")">@T["NameAscending"]</option>
+                <option value="price_asc" selected="@(Model.Sort == "price_asc")">@T["PriceAscending"]</option>
+                <option value="price_desc" selected="@(Model.Sort == "price_desc")">@T["PriceDescending"]</option>
+                <option value="prep_asc" selected="@(Model.Sort == "prep_asc")">@T["PrepAscending"]</option>
+            </select>
+        </div>
+        <div class="field filter-actions">
+            <button type="submit" class="btn primary">@T["ApplyFilters"]</button>
+            <a class="btn ghost" asp-action="Index">@T["ClearFilters"]</a>
+        </div>
+    </form>
+    <div asp-validation-summary="All" class="validation"></div>
+</section>
+
+<section class="panel table-panel">
+    <div class="section-heading"><h2>@T["Dishes"]</h2><span class="count">@Model.Dishes.Count @T["ItemsFound"]</span></div>
+    @if (!Model.Dishes.Any())
+    {
+        <div class="empty">@T["NoDishes"]</div>
+    }
+    else
+    {
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>@T["Photos"]</th>
+                        <th>@T["Name"]</th>
+                        <th>@T["Category"]</th>
+                        <th>@T["Price"]</th>
+                        <th>@T["PreparationTime"]</th>
+                        <th>@T["PrepClass"]</th>
+                        <th>@T["Status"]</th>
+                        <th>@T["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dish in Model.Dishes)
+                    {
+                        var cover = dish.Images.FirstOrDefault(i => i.IsThumbnail) ?? dish.Images.FirstOrDefault();
+                        <tr>
+                            <td><img class="table-photo" src="@(cover?.ImageUrl ?? "/images/no-image.svg")" alt="@dish.Name" /></td>
+                            <td class="dish-name">@dish.Name</td>
+                            <td>@dish.DishCategory.Name</td>
+                            <td class="price">@dish.Price.ToString("N0")</td>
+                            <td>@dish.PreparationTime @T["Minutes"]</td>
+                            <td>
+                                <span class="pill @(dish.PreparationTime <= 15 ? "quick" : "regular")">
+                                    @(dish.PreparationTime <= 15 ? T["Quick"] : T["Regular"])
+                                </span>
+                            </td>
+                            <td>
+                                <span class="pill @(dish.IsAvailable ? "available" : "unavailable")">
+                                    @(dish.IsAvailable ? T["Available"] : T["Unavailable"])
+                                </span>
+                            </td>
+                            <td class="action-links">
+                                <a asp-action="Details" asp-route-id="@dish.Id">@T["View"]</a>
+                                <a asp-action="Edit" asp-route-id="@dish.Id">@T["Edit"]</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
